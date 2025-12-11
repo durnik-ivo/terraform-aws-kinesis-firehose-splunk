@@ -341,6 +341,12 @@ variable "self_managed_hec_token" {
   default     = null
 }
 
+variable "self_managed_hec_token_secrets_manager_secret_arn" {
+  description = "This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec_token is not specified."
+  type        = string
+  default     = null
+}
+
 variable "lambda_processing_buffer_size_in_mb" {
   description = "Lambda processing buffer size in mb."
   type        = number

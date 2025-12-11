@@ -59,6 +59,15 @@ resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
     s3_backup_mode             = var.s3_backup_mode
     retry_duration             = var.kinesis_firehose_retry_duration
 
+    dynamic "secrets_manager_configuration" {
+      for_each = var.self_managed_hec_token_secrets_manager_secret_arn != null ? [1] : []
+      content {
+        enabled    = var.self_managed_hec_token_secrets_manager_secret_arn != null ? true : false
+        secret_arn = var.self_managed_hec_token_secrets_manager_secret_arn
+        role_arn   = aws_iam_role.kinesis_firehose.arn
+      }
+    }
+
     s3_configuration {
       role_arn           = aws_iam_role.kinesis_firehose.arn
       prefix             = var.s3_prefix
@@ -384,6 +393,21 @@ data "aws_iam_policy_document" "kinesis_firehose_policy_document" {
       aws_cloudwatch_log_group.kinesis_logs.arn,
       "${aws_cloudwatch_log_group.kinesis_logs.arn}:*",
     ]
+  }
+
+  dynamic "statement" {
+    for_each = var.self_managed_hec_token_secrets_manager_secret_arn != null ? [1] : []
+    content {
+      actions = [
+        "secretsmanager:GetSecretValue",
+      ]
+
+      effect = "Allow"
+
+      resources = [
+        var.self_managed_hec_token_secrets_manager_secret_arn,
+      ]
+    }
   }
 }
 
