@@ -18,6 +18,7 @@ variable "hec_url" {
 variable "hec_token" {
   description = "Splunk security token needed to submit data to Splunk. Required if var.self_managed_hec_token and var.self_managed_hec_token_secrets_manager_secret_arn are not specified."
   type        = string
+  sensitive   = true
   default     = null
 }
 
