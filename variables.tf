@@ -16,7 +16,7 @@ variable "hec_url" {
 }
 
 variable "hec_token" {
-  description = "Splunk security token needed to submit data to Splunk. Required if var.self_managed_hec_token is not specified."
+  description = "Splunk security token needed to submit data to Splunk. Required if var.self_managed_hec_token and var.self_managed_hec_token_secrets_manager_secret_arn are not specified."
   type        = string
   default     = null
 }
@@ -335,14 +335,14 @@ variable "object_lock_configuration_years" {
 }
 
 variable "self_managed_hec_token" {
-  description = "This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec_token is not specified."
+  description = "This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec_token and var.self_managed_hec_token_secrets_manager_secret_arn are not specified."
   type        = string
   sensitive   = true
   default     = null
 }
 
 variable "self_managed_hec_token_secrets_manager_secret_arn" {
-  description = "This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec_token is not specified."
+  description = "This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to increase security by not passing the HEC token directly, but instead they want to let Firehose fetch it from AWS SM. Required if var.hec_token and var.self_managed_hec_token are not specified."
   type        = string
   default     = null
 }
