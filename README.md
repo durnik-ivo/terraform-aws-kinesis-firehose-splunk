@@ -58,6 +58,7 @@ As of v7.0.0, there are two additional options available to pass in the HEC toke
 |------|---------|
 | <a name="provider_archive"></a> [archive](#provider\_archive) | 2.7.1 |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 6.11.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 
 ### Modules
 
@@ -94,6 +95,7 @@ As of v7.0.0, there are two additional options available to pass in the HEC toke
 | [aws_s3_bucket_public_access_block.kinesis_firehose_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_server_side_encryption_configuration.kinesis_firehose_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
 | [aws_s3_bucket_versioning.kinesis_firehose_s3_bucket_versioning](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
+| [null_resource.hec_token_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [archive_file.lambda_function](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.cloudwatch_to_fh_access_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -128,7 +130,7 @@ As of v7.0.0, there are two additional options available to pass in the HEC toke
 | <a name="input_firehose_server_side_encryption_key_type"></a> [firehose\_server\_side\_encryption\_key\_type](#input\_firehose\_server\_side\_encryption\_key\_type) | Type of SSE key to be used for encrypting the Firehose. Valid values are `AWS_OWNED_CMK` and `CUSTOMER_MANAGED_CMK` | `string` | `null` | no |
 | <a name="input_hec_acknowledgment_timeout"></a> [hec\_acknowledgment\_timeout](#input\_hec\_acknowledgment\_timeout) | The amount of time, in seconds between 180 and 600, that Kinesis Firehose waits to receive an acknowledgment from Splunk after it sends it data. | `number` | `300` | no |
 | <a name="input_hec_endpoint_type"></a> [hec\_endpoint\_type](#input\_hec\_endpoint\_type) | Splunk HEC endpoint type; `Raw` or `Event` | `string` | `"Raw"` | no |
-| <a name="input_hec_token"></a> [hec\_token](#input\_hec\_token) | Splunk security token needed to submit data to Splunk. Required if var.self\_managed\_hec\_token is not specified. | `string` | `null` | no |
+| <a name="input_hec_token"></a> [hec\_token](#input\_hec\_token) | Splunk security token needed to submit data to Splunk. Required if var.self\_managed\_hec\_token and var.self\_managed\_hec\_token\_secrets\_manager\_secret\_arn are not specified. | `string` | `null` | no |
 | <a name="input_kinesis_firehose_buffer"></a> [kinesis\_firehose\_buffer](#input\_kinesis\_firehose\_buffer) | https://www.terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html#buffer_size | `number` | `5` | no |
 | <a name="input_kinesis_firehose_buffer_interval"></a> [kinesis\_firehose\_buffer\_interval](#input\_kinesis\_firehose\_buffer\_interval) | Buffer incoming data for the specified period of time, in seconds, before delivering it to the destination | `number` | `300` | no |
 | <a name="input_kinesis_firehose_iam_policy_name"></a> [kinesis\_firehose\_iam\_policy\_name](#input\_kinesis\_firehose\_iam\_policy\_name) | Name of the IAM Policy attached to IAM Role for the Kinesis Firehose | `string` | `"KinesisFirehose-Policy"` | no |
@@ -164,7 +166,8 @@ As of v7.0.0, there are two additional options available to pass in the HEC toke
 | <a name="input_s3_bucket_server_side_encryption_kms_master_key_id"></a> [s3\_bucket\_server\_side\_encryption\_kms\_master\_key\_id](#input\_s3\_bucket\_server\_side\_encryption\_kms\_master\_key\_id) | AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse\_algorithm as aws:kms. The default aws/s3 AWS KMS master key is used if this element is absent while the sse\_algorithm is aws:kms | `string` | `null` | no |
 | <a name="input_s3_compression_format"></a> [s3\_compression\_format](#input\_s3\_compression\_format) | The compression format for what the Kinesis Firehose puts in the s3 bucket | `string` | `"GZIP"` | no |
 | <a name="input_s3_prefix"></a> [s3\_prefix](#input\_s3\_prefix) | Optional prefix (a slash after the prefix will show up as a folder in the s3 bucket).  The YYYY/MM/DD/HH time format prefix is automatically used for delivered S3 files. | `string` | `"kinesis-firehose/"` | no |
-| <a name="input_self_managed_hec_token"></a> [self\_managed\_hec\_token](#input\_self\_managed\_hec\_token) | This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec\_token is not specified. | `string` | `null` | no |
+| <a name="input_self_managed_hec_token"></a> [self\_managed\_hec\_token](#input\_self\_managed\_hec\_token) | This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to use a different tool than SSM or KMS encryption in their code base to encrypt it. Required if var.hec\_token and var.self\_managed\_hec\_token\_secrets\_manager\_secret\_arn are not specified. | `string` | `null` | no |
+| <a name="input_self_managed_hec_token_secrets_manager_secret_arn"></a> [self\_managed\_hec\_token\_secrets\_manager\_secret\_arn](#input\_self\_managed\_hec\_token\_secrets\_manager\_secret\_arn) | This variable allows for the user to have additional flexibility in how they pass in the HEC token. Perhaps they want to increase security by not passing the HEC token directly, but instead they want to let Firehose fetch it from AWS SM. Required if var.hec\_token and var.self\_managed\_hec\_token are not specified. | `string` | `null` | no |
 | <a name="input_subscription_filter_pattern"></a> [subscription\_filter\_pattern](#input\_subscription\_filter\_pattern) | Filter pattern for the CloudWatch Log Group subscription to the Kinesis Firehose. See [this](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html) for filter pattern info. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to put on the resource | `map(string)` | `{}` | no |
 
